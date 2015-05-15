@@ -1,8 +1,22 @@
 <?php
-//{{HEADER}}
+/**
+ * The initial loader file of Client Dash.
+ *
+ * @package ClientDash
+ *
+ * {{HEADER}}
+ */
 
-// Require the functions class first so we can extend it
-include_once( plugin_dir_path( __FILE__ ) . 'core/functions.php' );
+if ( ! defined( 'ABSPATH' ) ) {
+	die;
+}
+
+define( 'CD_VERSION', '1.6.7' );
+define ( 'CD_PATH', plugin_dir_path( __FILE__ ) );
+define( 'CD_URL', plugins_url( '', __FILE__ ) );
+
+require_once __DIR__ . '/core/class-cd.php';
+ClientDash::getInstance();
 
 /**
  * Class ClientDash
@@ -10,28 +24,14 @@ include_once( plugin_dir_path( __FILE__ ) . 'core/functions.php' );
  * The main class for Client Dash. This class does everything needed to
  * initialize the plugin.
  *
- * @package WordPress
+ * @package    WordPress
  * @subpackage ClientDash
  *
- * @category Base Functionality
+ * @category   Base Functionality
  *
- * @since Client Dash 1.5
+ * @since      Client Dash 1.5
  */
-class ClientDash extends ClientDash_Functions {
-
-	/**
-	 * Current version of Client Dash.
-	 *
-	 * @since Client Dash 1.5
-	 */
-	protected static $version = '1.6.7';
-
-	/**
-	 * The path to the plugin.
-	 *
-	 * @since Client Dash 1.6
-	 */
-	public $path;
+class ClientDashOLD {
 
 	/**
 	 * A list of all tab files to include.
@@ -81,28 +81,28 @@ class ClientDash extends ClientDash_Functions {
 			'title'       => 'Account',
 			'ID'          => 'cd_account',
 			'description' => 'The core Client Dash account page.',
-			'callback'   => array( 'ClientDash_Widget_Account', 'widget_content' ),
+			'callback'    => array( 'ClientDash_Widget_Account', 'widget_content' ),
 			'_cd_core'    => '1',
 		),
 		'cd_help'      => array(
 			'title'       => 'Help',
 			'ID'          => 'cd_help',
 			'description' => 'The core Client Dash help page.',
-			'callback'   => array( 'ClientDash_Widget_Help', 'widget_content' ),
+			'callback'    => array( 'ClientDash_Widget_Help', 'widget_content' ),
 			'_cd_core'    => '1',
 		),
 		'cd_reports'   => array(
 			'title'       => 'Reports',
 			'ID'          => 'cd_reports',
 			'description' => 'The core Client Dash reports page.',
-			'callback'   => array( 'ClientDash_Widget_Reports', 'widget_content' ),
+			'callback'    => array( 'ClientDash_Widget_Reports', 'widget_content' ),
 			'_cd_core'    => '1',
 		),
 		'cd_webmaster' => array(
 			'title'       => 'Webmaster',
 			'ID'          => 'cd_webmaster',
 			'description' => 'The core Client Dash webmaster page.',
-			'callback'   => array( 'ClientDash_Widget_Webmaster', 'widget_content' ),
+			'callback'    => array( 'ClientDash_Widget_Webmaster', 'widget_content' ),
 			'_cd_core'    => '1',
 		),
 	);
@@ -305,67 +305,46 @@ class ClientDash extends ClientDash_Functions {
 	 *
 	 * @since Client Dash 1.5
 	 */
-	function __construct() {
-
-		// Update all options if not set
-		$init_reset = get_option( 'cd_initial_reset' );
-		if ( empty( $init_reset ) ) {
-			add_action( 'admin_init', array( $this, 'reset_settings' ) );
-			update_option( 'cd_initial_reset', true );
-		}
-
-		// Set the path
-		$this->path = plugin_dir_path( __FILE__ );
-
-		// Register and enqueue our scripts / styles
-		add_action( 'admin_init', array( $this, 'register_scripts' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-
-		// Save our color scheme and then use it
-		add_action( 'admin_init', array( $this, 'save_admin_colors' ) );
-		add_action( 'admin_head', array( $this, 'assign_admin_colors' ) );
+	protected function __construct() {
 
 		// Make the dashboard one column
-		add_filter( 'screen_layout_columns', array( $this, 'alter_dashboard_columns' ) );
-		add_filter( 'get_user_option_screen_layout_dashboard', array( $this, 'return_1' ) );
+//		add_filter( 'screen_layout_columns', array( $this, 'alter_dashboard_columns' ) );
+//		add_filter( 'get_user_option_screen_layout_dashboard', array( $this, 'return_1' ) );
 
 		// Remove any dashboard settings that may have been previously set
-		add_action( 'admin_init', array( $this, 'remove_dashboard_settings' ) );
+//		add_action( 'admin_init', array( $this, 'remove_dashboard_settings' ) );
 
 		// Remove items from admin bar
-		add_action( 'admin_menu', array( $this, 'remove_admin_bar_menus' ), 999 );
-
-		// Remove the WP logo
-		add_action( 'wp_before_admin_bar_render', array( $this, 'remove_wp_logo' ), 0 );
+//		add_action( 'admin_menu', array( $this, 'remove_admin_bar_menus' ), 999 );
 
 		// Remove some default toolbar items
-		add_action( 'admin_menu', array( $this, 'remove_toolbar_items' ), 999 );
+//		add_action( 'admin_menu', array( $this, 'remove_toolbar_items' ), 999 );
 
 		// Save all of the active widgets into an option for use on non-dashboard pages
-		add_action( 'wp_dashboard_setup', array( $this, 'get_active_widgets' ), 997 );
+//		add_action( 'wp_dashboard_setup', array( $this, 'get_active_widgets' ), 997 );
 
 		// Removes default dashboard widgets
-		add_action( 'wp_dashboard_setup', array( $this, 'remove_default_dashboard_widgets' ), 998 );
+//		add_action( 'wp_dashboard_setup', array( $this, 'remove_default_dashboard_widgets' ), 998 );
 
 		// Initializes the dashboard widgets
-		add_action( 'wp_dashboard_setup', array( $this, 'add_new_widgets' ), 999 );
+//		add_action( 'wp_dashboard_setup', array( $this, 'add_new_widgets' ), 999 );
 
 		// Removes the WordPress welcome panel from the dashboard
-		remove_action( 'welcome_panel', 'wp_welcome_panel' );
+//		remove_action( 'welcome_panel', 'wp_welcome_panel' );
 
 		// Remove the screen options from the dashboard
-		add_action( 'admin_head-index.php', array( $this, 'remove_screen_options' ) );
+//		add_action( 'admin_head-index.php', array( $this, 'remove_screen_options' ) );
 
 		// Initialize the content sections
 		// NOTE: this is intentionally not "admin_init". This needs to fire before "admin_menu",
 		// but unfortunately "admin_init" fires after "admin_menu". Which is dumb.
-		add_action( 'init', array( $this, 'content_sections_init' ) );
+//		add_action( 'init', array( $this, 'content_sections_init' ) );
 
 		// Shows any admin notices
-		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
+//		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
 
 		// Adds a few more action links to plugins list
-		add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), array( $this, 'action_links' ) );
+//		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'action_links' ) );
 	}
 
 	public static function get_version() {
@@ -394,7 +373,7 @@ class ClientDash extends ClientDash_Functions {
 			'cd-main',
 			plugins_url( 'assets/css/clientdash.min.css', __FILE__ ),
 			array(),
-			WP_DEBUG == false? self::$version : time()
+			WP_DEBUG == false ? self::$version : time()
 		);
 	}
 
@@ -626,7 +605,7 @@ class ClientDash extends ClientDash_Functions {
 		global $wp_meta_boxes;
 
 		$sidebars = get_option( 'sidebars_widgets' );
-		
+
 		/**
 		 * This allows the currently visible dashboard "sidebar" to be changed from the default.
 		 *
@@ -875,15 +854,16 @@ class ClientDash extends ClientDash_Functions {
 	 * @return array
 	 */
 	public function action_links( $links ) {
-		$links[] = '<a href="'. get_admin_url(null, 'options-general.php?page=cd_settings') .'">Settings</a>';
+		$links[] = '<a href="' . get_admin_url( null, 'options-general.php?page=cd_settings' ) . '">Settings</a>';
 		$links[] = '<a href="http://realbigplugins.com/?utm_source=Client%20Dash&utm_medium=Plugins%20list%20link&utm_campaign=Client%20Dash%20Plugin" target="_blank">More Real Big Plugins</a>';
 		$links[] = '<a href="http://realbigplugins.com/subscribe/?utm_source=Client%20Dash&utm_medium=Plugins%20list%20link&utm_campaign=Client%20Dash%20Plugin" target="_blank">Subscribe</a>';
+
 		return $links;
 	}
 }
 
 // Initialize the main Client Dash object
-$ClientDash = new ClientDash();
+//ClientDash::getInstance();
 
 // Require other files
-include_once( plugin_dir_path( __FILE__ ) . 'core/include-files.php' );
+//include_once( plugin_dir_path( __FILE__ ) . 'core/include-files.php' );

@@ -12,7 +12,7 @@
  *
  * @since Client Dash 1.6
  */
-class CD_Widget extends WP_Widget {
+class CD_Widgeat extends WP_Widget {
 
 	/**
 	 * The ID of the widget.
@@ -102,6 +102,7 @@ class CD_Widget extends WP_Widget {
 			if ( isset( $widget['completed'] ) ) {
 				continue;
 			}
+
 			$ClientDash_Core_Page_Settings_Tab_Widgets->widgets[ $i ]['completed'] = true;
 
 			$this->id                 = isset( $widget['id'] ) ? $widget['id'] : $this->id;
