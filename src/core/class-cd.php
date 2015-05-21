@@ -40,7 +40,7 @@ class ClientDash {
 	 *
 	 * @var CD_Dashboard
 	 */
-	protected $dashboard;
+	public $dashboard;
 
 	private function __clone() {
 		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'ClientDash' ), '2.1' );
@@ -73,12 +73,8 @@ class ClientDash {
 	 */
 	protected function __construct() {
 
-		$this->register_assets();
-
 		if ( is_admin() ) {
-
-			$this->require_core();
-			$this->enqueue_necessities();
+			$this->load_core();
 			$this->add_core_actions();
 		}
 	}
@@ -88,7 +84,10 @@ class ClientDash {
 	 *
 	 * @since {{VERSION}}
 	 */
-	private function require_core() {
+	private function load_core() {
+
+		// Core Functions
+		require_once __DIR__ . '/cd-core-functions.php';
 
 		// Color Scheme
 		require_once __DIR__ . '/class-cd-colorscheme.php';
@@ -104,8 +103,15 @@ class ClientDash {
 	 *
 	 * @since {{VERSION}}
 	 */
-	private function register_assets() {
+	function _register_assets() {
 
+		// Admin script
+		wp_register_script(
+			'CD-admin',
+			CD_URL . '/assets/js/client-dash.min.js',
+			array( 'jquery' ),
+			defined( 'WP_DEBUG' ) && WP_DEBUG ? time() : CD_VERSION
+		);
 	}
 
 	/**
@@ -113,8 +119,9 @@ class ClientDash {
 	 *
 	 * @since {{VERSION}}
 	 */
-	private function enqueue_necessities() {
+	function _enqueue_necessities() {
 
+		wp_enqueue_script( 'CD-admin' );
 	}
 
 	/**
@@ -125,6 +132,8 @@ class ClientDash {
 	private function add_core_actions() {
 
 		add_action( 'admin_menu', array( $this, '_add_clientdash_menu' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, '_enqueue_necessities' ) );
+		add_action( 'admin_init', array( $this, '_register_assets' ) );
 	}
 
 	/**

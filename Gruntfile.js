@@ -28,12 +28,8 @@ module.exports = function (grunt) {
                 tasks: ['sass:admin', 'autoprefixer', 'notify:sass_admin']
             },
             js: {
-                files: ['src/assets/js/source/**/*.js', '!src/assets/js/source/admin/**/*.js'],
-                tasks: ['uglify:src', 'notify:js']
-            },
-            js_admin: {
-                files: ['src/assets/js/source/admin/*.js'],
-                tasks: ['uglify:admin', 'notify:js_admin']
+                files: ['src/assets/js/source/**/*.js'],
+                tasks: ['uglify:main', 'notify:js']
             },
             livereload: {
                 files: [
@@ -54,14 +50,9 @@ module.exports = function (grunt) {
             options: {
                 sourceMap: true
             },
-            src: {
+            main: {
                 files: {
-                    'src/assets/js/client-dash.min.js': ['src/assets/js/source/**/*.js', '!src/assets/js/source/admin/**/*.js']
-                }
-            },
-            admin: {
-                files: {
-                    'src/assets/js/client-dash-admin.min.js': ['src/assets/js/source/admin/*.js']
+                    'src/assets/js/client-dash.min.js': ['src/assets/js/source/dashboard.js']
                 }
             }
         },

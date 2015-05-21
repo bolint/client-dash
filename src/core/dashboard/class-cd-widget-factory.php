@@ -11,11 +11,15 @@ class CD_WP_Widget_Factory extends WP_Widget_Factory {
 	 * Extend register($widget_class) with ability to pass parameters into widgets
 	 *
 	 * @param string     $widget_class Class of the new Widget
-	 * @param array|null $widget       parameters to pass through to the widget
+	 * @param array|bool $widget       parameters to pass through to the widget
 	 */
-	function register( $widget_class, $widget = array() ) {
+	function register( $widget_class, $widget = false ) {
 
-		$this->widgets[ $widget['id'] ] = new $widget_class( $widget );
+		if ( $widget ) {
+			$this->widgets[ $widget['id'] ] = new $widget_class( $widget );
+		} else {
+			$this->widgets[$widget_class] = new $widget_class();
+		}
 	}
 
 
