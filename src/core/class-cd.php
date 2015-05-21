@@ -112,6 +112,17 @@ class ClientDash {
 			array( 'jquery' ),
 			defined( 'WP_DEBUG' ) && WP_DEBUG ? time() : CD_VERSION
 		);
+
+		/**
+		 * Allows filtering of the CD translations.
+		 *
+		 * @since {{VERSION}}
+		 */
+		$translations = apply_filters( 'cd_translations', array(
+
+		));
+
+		wp_localize_script( 'CD-admin', 'CD_l18n', $translations );
 	}
 
 	/**

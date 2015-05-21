@@ -85,6 +85,8 @@ class CD_Dashboard {
 
 		$page = isset( $_REQUEST['page'] ) ? $_REQUEST['page'] : false;
 
+		add_action( 'cd_translations', array( $this, '_translations' ) );
+
 		add_action( 'admin_menu', array( $this, '_add_submenu_page' ) );
 
 		add_action( 'setup_theme', array( $this, '_cd_widget_factory_load' ), 0, 0 );
@@ -103,6 +105,22 @@ class CD_Dashboard {
 			require_once __DIR__ . '/class-cd-dashboard-settings.php';
 			$this->settings = new CD_Dashboard_Settings();
 		}
+	}
+
+	/**
+	 * Adds Dashboard translations.
+	 *
+	 * @since {{VERSION}}
+	 *
+	 * @param array $translations The tranlslations.
+	 *
+	 * @return array The new translations.
+	 */
+	function _translations( $translations ) {
+
+		$translations['one_widget_per_sidebar'] = __( 'Can only have one widget of this type per sidebar.', 'ClientDash' );
+
+		return $translations;
 	}
 
 	/**
