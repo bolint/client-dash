@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die;
 }
 
-// FIXME only add dash widgets on dashboard and settings page. Currently loading everywhere
+// FIXME only add dash widgets on dashboard AND settings page. Currently loading everywhere
 // TODO figure out best way to sort, or not sort, widgets
 
 /**
@@ -37,7 +37,7 @@ class CD_Dashboard {
 	public $dash_widgets;
 
 	/**
-	 * Regsitered CD Widgets
+	 * Registered CD Widgets
 	 *
 	 * @since {{VERSION}}
 	 *
@@ -91,8 +91,13 @@ class CD_Dashboard {
 
 		add_action( 'setup_theme', array( $this, '_cd_widget_factory_load' ), 0, 0 );
 
-		add_action( 'widgets_init', array( $this, '_add_sidebars' ), 100 );
-		add_action( 'widgets_init', array( $this, '_add_widgets' ), 100 );
+		add_action( 'widgets_init', array( $this, 'add_sidebars' ), 100 );
+		add_action( 'widgets_init', array( $this, 'add_widgets' ), 100 );
+
+		add_action( 'current_screen', array( $this, 'hide_cd' ) );
+
+		add_filter( 'pre_update_option_sidebars_widgets', array( $this, 'preserve_sidebars' ), 10, 2 );
+//		add_filter( 'sidebars_widgets', array( $this, 'preserve_sidebars' ) );
 
 		add_action( 'wp_dashboard_setup', array( $this, '_get_widgets' ) );
 		add_action( 'wp_dashboard_setup', array( $this, '_save_dashboard_widgets' ), 98 );
@@ -124,7 +129,7 @@ class CD_Dashboard {
 	}
 
 	/**
-	 * Adds the Dashboard customization page to Admin.
+	 * Adds the Dashboard customization page to Client Dash.
 	 *
 	 * @since {{VERSION}}
 	 */
@@ -148,20 +153,20 @@ class CD_Dashboard {
 	function _cd_widget_factory_load() {
 
 		require_once __DIR__ . '/class-cd-widget-factory.php';
-		$GLOBALS['wp_widget_factory'] = CD_WP_Widget_Factory::get_instance();
+		$GLOBALS['wp_widget_factory'] = CD_Widget_Factory::get_instance();
 	}
 
 	/**
 	 * Add the CD sidebars.
 	 *
 	 * @since {{VERSION}}
+	 * @access private
 	 */
-	function _add_sidebars() {
+	function add_sidebars() {
 
 		global $wp_registered_sidebars, $wp_roles;
 
 		// Reset it (to prevent seeing the normal sidebars)
-		$wp_registered_sidebars = array();
 
 		$all_roles = $wp_roles->roles;
 
@@ -172,7 +177,7 @@ class CD_Dashboard {
 		$sidebars = array();
 		foreach ( $editable_roles as $ID => $role ) {
 			$sidebars[] = array(
-				'id' => "cd_dashboard_$ID",
+				'id'   => "cd_dashboard_$ID",
 				'name' => $role['name'],
 			);
 		}
@@ -193,8 +198,12 @@ class CD_Dashboard {
 	 * Adds Dashboard widgets to Available Widgets.
 	 *
 	 * @since {{VERSION}}
+	 * @access private
 	 */
-	function _add_widgets() {
+	function add_widgets() {
+
+		/* @var CD_Widget_Factory $wp_widget_factory */
+		global $wp_widget_factory;
 
 		$dashboard_widgets = get_option( 'cd_dashboard_widgets' );
 
@@ -210,9 +219,112 @@ class CD_Dashboard {
 				$dashboard_widgets[ $i ]['name'] = $widget['title'];
 				cd_register_widget( $widget );
 			}
+
+			// Adds the new widgets to GLOBALS
+			$wp_widget_factory->_register_widgets();
 		}
 
 		do_action( 'cd_add_dash_widgets' );
+	}
+
+	/**
+	 * Hides CD widgets and sidebars when not on a CD page.
+	 *
+	 * @since {{VERSION}}
+	 * @access private
+	 */
+	function hide_cd() {
+
+		/** @var WP_Screen $current_screen */
+		global $current_screen, $wp_registered_widgets, $wp_registered_sidebars;
+
+		// Only necessary on widgets page
+		if ( $current_screen->id !== 'widgets' ) {
+			return;
+		}
+
+		// Hide CD widgets and sidebars when not on CD page
+		if ( ! isset( $_GET['page'] ) || $_GET['page'] !== 'cd-dashboard' ) {
+
+			$hide_widgets  = array();
+			$hide_sidebars = array();
+
+			foreach ( $wp_registered_widgets as $widget_ID => $widget ) {
+
+				if ( isset( $widget['callback'][0] ) && $widget['callback'][0] instanceof CD_Widget ) {
+
+					$hide_widgets[] = $widget_ID;
+					unset( $wp_registered_widgets[ $widget_ID ] );
+				}
+			}
+
+			foreach ( $wp_registered_sidebars as $sidebar_ID => $sidebar ) {
+
+				// TODO Find more accurate method
+				if ( strpos( $sidebar_ID, 'cd_' ) !== false ) {
+
+					$hide_sidebars[] = $sidebar_ID;
+					unset( $wp_registered_sidebars[ $sidebar_ID ] );
+				}
+			}
+
+		} else {
+
+			// Hide NON CD widgets and sidebars when on CD page
+			$hide_widgets  = array();
+			$hide_sidebars = array();
+
+			foreach ( $wp_registered_widgets as $widget_ID => $widget ) {
+
+				if ( isset( $widget['callback'][0] ) && $widget['callback'][0] instanceof CD_Widget ) {
+					continue;
+				}
+
+				$hide_widgets[] = $widget_ID;
+				unset( $wp_registered_widgets[ $widget_ID ] );
+			}
+
+			foreach ( $wp_registered_sidebars as $sidebar_ID => $sidebar ) {
+
+				// TODO Find more accurate method
+				if ( strpos( $sidebar_ID, 'cd_' ) === false ) {
+
+					$hide_sidebars[] = $sidebar_ID;
+					unset( $wp_registered_sidebars[ $sidebar_ID ] );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Makes sure hidden sidebars don't get erased.
+	 *
+	 * When on the CD Dashboard page, default sidebars are hidden, and would be deleted upon save. Vice versa as well.
+	 * This makes sure this doesn't happen.
+	 *
+	 * @since {{VERSION}}
+	 * @access private
+	 *
+	 * @param array $sidebars_widgets
+	 * @param array $old_sidebars_widgets
+	 *
+	 * @return array
+	 */
+	function preserve_sidebars( $sidebars_widgets, $old_sidebars_widgets ) {
+
+		global $wp_registered_sidebars;
+
+		if ( ! $old_sidebars_widgets ) {
+			return $sidebars_widgets;
+		}
+
+		// Makes sure not to remove any registered sidebar, even if it's not present on the current page.
+		$sidebars_widgets = array_intersect_key(
+			array_merge( $sidebars_widgets, $old_sidebars_widgets ),
+			array_merge( $wp_registered_sidebars, array( 'array_version' => 1 ) )
+		);
+
+		return $sidebars_widgets;
 	}
 
 	/**
@@ -337,7 +449,7 @@ class CD_Dashboard {
 	 * @since {{VERSION}}
 	 *
 	 * @param string $object Supplied via meta box callback. Typically empty.
-	 * @param array  $box    The meta box info.
+	 * @param array $box The meta box info.
 	 */
 	public function dash_widget_callback( $object, $box ) {
 
@@ -370,5 +482,26 @@ class CD_Dashboard {
 		}
 
 		update_option( 'cd_dashboard_widgets', $dashboard_widgets );
+	}
+
+	/**
+	 * Determines if CD Widgets and Sidebars should load on the current page or not.
+	 *
+	 * @since {{VERSION}}
+	 *
+	 * @return bool
+	 */
+	private function load_cd() {
+
+		global $current_screen;
+
+		if ( ( ! $current_screen && ! defined( 'DOING_AJAX' ) ) ||
+		     ( $current_screen && $current_screen->id !== 'dashboard' &&
+		       ( ! isset( $_GET['page'] ) || $_GET['page'] !== 'cd-dashboard' ) )
+		) {
+			return false;
+		}
+
+		return true;
 	}
 }

@@ -1,9 +1,26 @@
 <?php
+/**
+ * Overrides the default widget factory in order to allow passing parameters to widget instances.
+ *
+ * @since {{VERSION}}
+ *
+ * @package ClientDash
+ * @subpackage ClientDash/core/dashboard
+ */
 
-class CD_WP_Widget_Factory extends WP_Widget_Factory {
+defined( 'ABSPATH' ) || die();
+
+/**
+ * Class CD_Widget_Factory
+ *
+ * Overrides the default widget factory in order to allow passing parameters to widget instances.
+ *
+ * @since {{VERSION}}
+ */
+class CD_Widget_Factory extends WP_Widget_Factory {
 
 	/**
-	 * @var CD_WP_Widget_Factory
+	 * @var CD_Widget_Factory
 	 */
 	private static $instance = null;
 
@@ -27,7 +44,7 @@ class CD_WP_Widget_Factory extends WP_Widget_Factory {
 	 * Get (and instantiate, if necessary) the instance of the class
 	 *
 	 * @static
-	 * @return Shared_Sidebars
+	 * @return CD_Widget_Factory
 	 */
 	public static function get_instance() {
 		if ( ! is_a( self::$instance, __CLASS__ ) ) {
@@ -45,7 +62,7 @@ class CD_WP_Widget_Factory extends WP_Widget_Factory {
 		trigger_error( "No serialization allowed!", E_USER_ERROR );
 	}
 
-	protected function __construct() {
+	function __construct() {
 		parent::__construct();
 	}
 

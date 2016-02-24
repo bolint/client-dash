@@ -21,6 +21,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function cd_register_widget( $widget ) {
 
+	/* @var CD_Widget_Factory $wp_widget_factory */
+	global $wp_widget_factory;
+
 	/**
 	 * Allows filtering of the widget default settings.
 	 *
@@ -42,9 +45,6 @@ function cd_register_widget( $widget ) {
 	$widget = wp_parse_args( $widget, $defaults );
 
 	require_once __DIR__ . '/class-cd-widget.php';
-
-	/** @var WP_Widget_Factory $wp_widget_factory */
-	global $wp_widget_factory;
 
 	$wp_widget_factory->register( 'CD_Widget', $widget );
 

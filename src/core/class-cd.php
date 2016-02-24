@@ -99,15 +99,28 @@ class ClientDash {
 	}
 
 	/**
-	 * Registers all plugin assets.
+	 * Adds globally necessary actions.
 	 *
 	 * @since {{VERSION}}
 	 */
-	function _register_assets() {
+	private function add_core_actions() {
+
+		add_action( 'admin_menu', array( $this, 'add_clientdash_menu' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_necessities' ) );
+		add_action( 'admin_init', array( $this, 'register_assets' ) );
+	}
+
+	/**
+	 * Registers all plugin assets.
+	 *
+	 * @since {{VERSION}}
+	 * @access private
+	 */
+	function register_assets() {
 
 		// Admin script
 		wp_register_script(
-			'CD-admin',
+			'cd-admin',
 			CD_URL . '/assets/js/client-dash.min.js',
 			array( 'jquery' ),
 			defined( 'WP_DEBUG' ) && WP_DEBUG ? time() : CD_VERSION
@@ -118,48 +131,37 @@ class ClientDash {
 		 *
 		 * @since {{VERSION}}
 		 */
-		$translations = apply_filters( 'cd_translations', array(
+		$translations = apply_filters( 'cd_translations', array() );
 
-		));
-
-		wp_localize_script( 'CD-admin', 'CD_l18n', $translations );
+		wp_localize_script( 'cd-admin', 'CD_l18n', $translations );
 	}
 
 	/**
 	 * Enqueues all immediately necessary plugin assets.
 	 *
 	 * @since {{VERSION}}
+	 * @access private
 	 */
-	function _enqueue_necessities() {
+	function enqueue_necessities() {
 
-		wp_enqueue_script( 'CD-admin' );
-	}
-
-	/**
-	 * Adds globally necessary actions.
-	 *
-	 * @since {{VERSION}}
-	 */
-	private function add_core_actions() {
-
-		add_action( 'admin_menu', array( $this, '_add_clientdash_menu' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, '_enqueue_necessities' ) );
-		add_action( 'admin_init', array( $this, '_register_assets' ) );
+		wp_enqueue_script( 'cd-admin' );
 	}
 
 	/**
 	 * Add the primary menu item.
 	 *
 	 * @since {{VERSION}}
+	 * @access private
 	 */
-	function _add_clientdash_menu() {
+	function add_clientdash_menu() {
 
+		// FIXME Changing "Admin" to "Client Dash" (or anything else) breaks this... what the heck...
 		add_menu_page(
 			__( 'Admin', 'ClientDash' ),
 			__( 'Admin', 'ClientDash' ),
 			'manage_options',
 			'cd-admin',
-			null,
+			'',
 			'dashicons-admin-generic',
 			61
 		);
