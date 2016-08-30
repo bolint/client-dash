@@ -77,12 +77,7 @@ module.exports = function (grunt) {
             },
             src: {
                 files: {
-                    'src/assets/css/client-dash.min.css': 'src/assets/scss/main.scss'
-                }
-            },
-            admin: {
-                files: {
-                    'src/assets/css/client-dash-admin.min.css': 'src/assets/scss/admin/admin.scss'
+                    'src/assets/css/clientdash.min.css': 'src/assets/scss/clientdash.scss'
                 }
             }
         },

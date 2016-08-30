@@ -4,3 +4,9 @@
   -o-transition: color 0.3s;
   transition: color 0.3s;
 }
+
+.notice.cd {
+  .notice-dismiss {
+    display: none;
+  }
+}
