@@ -57,6 +57,9 @@
 .notice.cd .notice-dismiss {
   display: none; }
 
+#adminmenu #collapse-menu:first-of-type {
+  display: none; }
+
 #cd-ajax-cover {
   position: fixed;
   top: 0;

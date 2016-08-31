@@ -10,3 +10,8 @@
     display: none;
   }
 }
+
+// Hide first collapse, if exist
+#adminmenu #collapse-menu:first-of-type {
+  display: none;
+}

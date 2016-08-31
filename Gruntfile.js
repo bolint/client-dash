@@ -56,12 +56,7 @@ module.exports = function (grunt) {
             },
             src: {
                 files: {
-                    'src/assets/js/client-dash.min.js': ['src/assets/js/source/**/*.js', '!src/assets/js/source/admin/**/*.js']
-                }
-            },
-            admin: {
-                files: {
-                    'src/assets/js/client-dash-admin.min.js': ['src/assets/js/source/admin/*.js']
+                    'src/assets/js/clientdash.min.js': ['src/assets/js/source/**/*.js']
                 }
             }
         },
