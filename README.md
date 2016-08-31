@@ -1,6 +1,6 @@
 ![banner](https://raw.githubusercontent.com/brashrebel/client-dash/master/assets/static/banner.png)
 
-# v1.6.11
+# v1.6.12
 
 [Releases](https://github.com/brashrebel/client-dash/releases)
 
@@ -36,6 +36,11 @@ Using this plugin is very simple. All you have to do is:
 3. Configure settings by going to Settings - >Client Dash
 
 ## Changelog
+
+### [1.6.12](https://github.com/brashrebel/client-dash/releases/tag/v1.6.12)
+* Fix conflict with plugin "Menu Icons".
+* Repair broken menu links feature.
+* Improved admin notices infastructure.
 
 ### [1.6.11](https://github.com/brashrebel/client-dash/releases/tag/v1.6.11)
 * Fix potential admin theme PHP notice.

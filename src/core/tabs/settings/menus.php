@@ -1860,7 +1860,7 @@ class ClientDash_Core_Page_Settings_Tab_Menus extends ClientDash {
 	/**
 	 * Sometimes, due to bugs, a menu item url is lost. This attempts to regain it.
 	 *
-	 * @since {{VERSION}}
+	 * @since 1.6.12
 	 *
 	 * @param WP_Post $menu_item The menu item post object.
 	 *
