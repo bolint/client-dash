@@ -843,7 +843,7 @@ class ClientDash extends ClientDash_Functions {
 		if ( isset( $_GET['cd_update_dash'] ) ) {
 
 			add_settings_error( '', '', sprintf(
-				__( 'Great! Thanks! Now you can return to the settings %here%.', 'clientdash' ),
+				__( 'Great! Thanks! Now you can return to the settings %shere%s.', 'clientdash' ),
 				'<a href="' . $this->get_settings_url( 'widgets' ) . '">',
 				'</a>'
 			), 'updated cd' );
